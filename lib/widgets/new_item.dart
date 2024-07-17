@@ -19,14 +19,14 @@ class _NewItemState extends State<NewItem> {
   var _enteredQuantity = 1;
   var _selectedCategory = categories[Categories.vegetables]!;
 
-  void _saveItem() {
+  void _saveItem() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
       final url = Uri.https(
           dotenv.env['FIREBASE_ENDPOINT'] as String, 'grocery_items.json');
 
-      http.post(
+      final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
@@ -36,7 +36,20 @@ class _NewItemState extends State<NewItem> {
         }),
       );
 
-      // Navigator.of(context).pop();
+      if (!context.mounted) return;
+
+      if (response.statusCode >= 400) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to add item: ${response.body}'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+        return;
+      }
+
+      Navigator.of(context).pop();
     }
   }
 
