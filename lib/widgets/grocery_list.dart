@@ -71,10 +71,34 @@ class _GroceryListState extends State<GroceryList> {
     });
   }
 
-  void _removeItem(GroceryItem item) {
+  void _removeItem(GroceryItem item) async {
+    final index = _groceryItems.indexOf(item);
+
     setState(() {
       _groceryItems.remove(item);
     });
+
+    final url = Uri.https(
+      dotenv.env['FIREBASE_ENDPOINT'] as String,
+      'grocery_items/${item.id}.json',
+    );
+
+    final response = await http.delete(url);
+
+    if (response.statusCode >= 400) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content:
+              const Text('Failed to delete item... Please try again later.'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+
+      setState(() {
+        _groceryItems.insert(index, item);
+      });
+    }
   }
 
   @override

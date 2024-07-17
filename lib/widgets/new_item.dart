@@ -47,7 +47,8 @@ class _NewItemState extends State<NewItem> {
       if (response.statusCode >= 400) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to add item: ${response.body}'),
+            content:
+                const Text('Failed to add item... Please try again later.'),
             backgroundColor: Theme.of(context).colorScheme.error,
             duration: const Duration(seconds: 2),
           ),
