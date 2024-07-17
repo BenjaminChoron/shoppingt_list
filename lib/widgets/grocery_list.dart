@@ -17,12 +17,21 @@ class GroceryList extends StatefulWidget {
 class _GroceryListState extends State<GroceryList> {
   final List<GroceryItem> _groceryItems = [];
   var _isLoading = true;
+  String? _error;
 
   void _loadItems() async {
     final url = Uri.https(
         dotenv.env['FIREBASE_ENDPOINT'] as String, 'grocery_items.json');
 
     final response = await http.get(url);
+
+    if (response.statusCode >= 400) {
+      setState(() {
+        _error = 'Failed to load items... Please try again later.';
+        _isLoading = false;
+      });
+      return;
+    }
 
     final Map<String, dynamic> extractedData = json.decode(response.body);
 
@@ -114,6 +123,10 @@ class _GroceryListState extends State<GroceryList> {
           ),
         ),
       );
+    }
+
+    if (_error != null) {
+      content = Center(child: Text(_error!));
     }
 
     return Scaffold(
