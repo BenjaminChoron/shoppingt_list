@@ -83,7 +83,7 @@ class _GroceryListState extends State<GroceryList> {
           )
         ],
       ),
-      body: content,
+      body: SafeArea(child: content),
     );
   }
 }
